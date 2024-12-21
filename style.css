@@ -1,0 +1,84 @@
+/* style.css */
+body {
+    margin: 0;
+    font-family: 'Lato', sans-serif;
+    background-color: #121212;
+    /* Dark background */
+    color: #FFFFFF;
+    /* White text for high contrast */
+}
+
+#container {
+    padding: 20px;
+}
+
+#header {
+    background-color: #1E1E1E;
+    /* Slightly lighter dark background */
+    padding: 10px;
+    border-bottom: 2px solid #FFFFFF;
+    /* White border for emphasis */
+}
+
+h1 {
+    margin: 0;
+    font-size: 24px;
+    text-align: center;
+}
+
+#content {
+    margin-top: 20px;
+    padding: 10px;
+    background-color: #1E1E1E;
+    /* Same as header for uniformity */
+    color: #E0E0E0;
+    /* Light gray for softer text */
+    border-radius: 5px;
+}
+
+/* Container for bookmarks */
+.bookmarks {
+    display: flex;
+    gap: 20px;
+    /* Space between items */
+    justify-content: center;
+    /* Center the bookmarks horizontally */
+    flex-wrap: wrap;
+    /* Wrap to next line if there's not enough space */
+    margin-top: 20px;
+}
+
+/* Individual bookmark styling */
+.bookmark {
+    text-align: center;
+    width: 150px;
+    /* Set a fixed width for consistency */
+}
+
+.bookmark img {
+    width: 100%;
+    border-radius: 5px;
+    /* Optional rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    /* Optional shadow for effect */
+}
+
+.bookmark p {
+    margin-top: 10px;
+    font-size: 16px;
+    color: #FFFFFF;
+    font-weight: bold;
+}
+
+/* Link styling */
+.bookmark a {
+    text-decoration: none;
+    /* Remove underline */
+    color: inherit;
+    /* Keep text color as defined */
+}
+
+.bookmark a:hover p {
+    color: #FFD700;
+    /* Change text color on hover */
+}
