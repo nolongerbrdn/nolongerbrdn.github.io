@@ -1,7 +1,7 @@
 const fetchBookmarks = async () => {
     try {
         const response = await fetch(
-            "https://brdnsbookmarkapi.netlify.app/.netlify/functions/fetch-bookmarks",
+            "https://brdnsbookmarkapi.netlify.app/netlify/functions/fetch-bookmarks",
             { method: "POST" }
         );
         const data = await response.json();
