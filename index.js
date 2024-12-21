@@ -1,11 +1,10 @@
 const booksContainer = document.querySelector('.bookmarks');
 const loadingIndicator = document.getElementById('loading');
 
-// Fetch books data
+// Fetch and load books
 fetch('data/books.json')
     .then((response) => response.json())
     .then((books) => {
-
         if (books.length === 0) {
             const noBooksMessage = document.createElement('p');
             noBooksMessage.textContent = 'No books available at the moment.';
@@ -21,34 +20,46 @@ fetch('data/books.json')
     });
 
 document.addEventListener('DOMContentLoaded', () => {
+    const modal = document.getElementById('bookmark-modal'); // Add Bookmark modal
+    const editModal = document.getElementById('edit-bookmark-modal'); // Edit Bookmark modal
     const addBtn = document.getElementById('add-btn');
-    const modal = document.getElementById('bookmark-modal');
-    const editModal = document.getElementById('edit-bookmark-modal'); // New modal for editing
     const saveBtn = document.getElementById('save-bookmark');
     const cancelBtn = document.getElementById('cancel-bookmark');
-    const saveEditBtn = document.getElementById('save-edit-bookmark'); // Button for saving edited bookmark
-    const cancelEditBtn = document.getElementById('cancel-edit-bookmark'); // Button for cancelling edit
-    const bookmarksContainer = document.querySelector('.bookmarks');
+    const saveEditBtn = document.getElementById('save-edit-bookmark');
+    const cancelEditBtn = document.getElementById('cancel-edit-bookmark');
+    const removeEditBtn = document.getElementById('remove-bookmark');
 
-    // Load bookmarks from localStorage on page load
+    // Load bookmarks from localStorage
     loadBookmarksFromLocalStorage();
 
-    // Show the modal when the "Add Bookmark" button is clicked
+    // Show Add Bookmark modal
     addBtn.addEventListener('click', () => {
         modal.style.display = 'block';
     });
 
-    // Close the modal when the "Cancel" button is clicked (for adding)
+    // Cancel Add Bookmark modal
     cancelBtn.addEventListener('click', () => {
-        modal.style.display = 'none';
+        modal.style.display = "none";
     });
 
-    // Close the edit modal when the "Cancel" button is clicked (for editing)
+    // Show Edit Bookmark modal when "Edit" is clicked
+    // Modify this part
+    document.querySelector('.bookmarks').addEventListener('click', (event) => {
+        if (event.target.classList.contains('edit-btn')) {
+            const bookmarkDiv = event.target.closest('.bookmark');
+            const bookmarkId = bookmarkDiv.getAttribute('data-id');
+            const savedBookmarks = JSON.parse(localStorage.getItem('bookmarks')) || [];
+            const bookmark = savedBookmarks.find((bookmark) => bookmark.id === bookmarkId);
+            openEditModal(bookmark);
+        }
+    });
+
+    // Cancel Edit Bookmark modal
     cancelEditBtn.addEventListener('click', () => {
-        editModal.style.display = 'none';
+        editModal.style.display = "none";
     });
 
-    // Save bookmark when the "Save" button is clicked
+    // Save new bookmark
     saveBtn.addEventListener('click', () => {
         const title = document.getElementById('title').value;
         const coverUrl = document.getElementById('cover').value;
@@ -56,24 +67,20 @@ document.addEventListener('DOMContentLoaded', () => {
         const password = document.getElementById('password').value;
 
         if (title && coverUrl && bookmarkLink) {
-            // Create a new bookmark object
             const newBookmark = {
                 title: title,
                 cover: coverUrl,
                 link: bookmarkLink,
-                password: password
+                password: password,
+                status: 'Active'
             };
 
-            // Save the new bookmark to localStorage
             saveBookmarkToLocalStorage(newBookmark);
-
-            // Add the bookmark to the DOM
             addBookmarkToDOM(newBookmark);
 
-            // Close the modal
-            modal.style.display = 'none';
+            modal.style.display = "none";
 
-            // Clear the form
+            // Clear input fields
             document.getElementById('title').value = '';
             document.getElementById('cover').value = '';
             document.getElementById('link').value = '';
@@ -83,62 +90,79 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Save edited bookmark when "Save Edit" is clicked
+    // Save edited bookmark
     saveEditBtn.addEventListener('click', () => {
         const title = document.getElementById('edit-title').value;
         const coverUrl = document.getElementById('edit-cover').value;
         const bookmarkLink = document.getElementById('edit-link').value;
+        const status = document.getElementById('edit-status').value;
+
+        const bookmarkId = document.getElementById('edit-id').value;
 
         if (title && coverUrl && bookmarkLink) {
-            // Find the bookmark by its index in localStorage
-            const bookmarkId = document.getElementById('edit-id').value; // The unique ID for the bookmark
             const savedBookmarks = JSON.parse(localStorage.getItem('bookmarks')) || [];
             const bookmarkToEdit = savedBookmarks.find((bookmark) => bookmark.id === bookmarkId);
 
-            // Update the bookmark data
             bookmarkToEdit.title = title;
             bookmarkToEdit.cover = coverUrl;
             bookmarkToEdit.link = bookmarkLink;
+            bookmarkToEdit.status = status;
 
-            // Save the updated bookmark list back to localStorage
             localStorage.setItem('bookmarks', JSON.stringify(savedBookmarks));
 
-            // Update the DOM with the new data
             updateBookmarkInDOM(bookmarkToEdit);
-
-            // Close the edit modal
-            editModal.style.display = 'none';
-
-            // Clear the form
-            document.getElementById('edit-title').value = '';
-            document.getElementById('edit-cover').value = '';
-            document.getElementById('edit-link').value = '';
+            editModal.style.display = "none";
         } else {
             alert("Title, cover URL, and bookmark link are required!");
         }
     });
+
+    // Remove bookmark functionality
+    removeEditBtn.addEventListener('click', () => {
+        const bookmarkId = document.getElementById('edit-id').value;
+        const savedBookmarks = JSON.parse(localStorage.getItem('bookmarks')) || [];
+        const updatedBookmarks = savedBookmarks.filter((bookmark) => bookmark.id !== bookmarkId);
+
+        localStorage.setItem('bookmarks', JSON.stringify(updatedBookmarks));
+
+        const bookmarkDiv = document.querySelector(`.bookmark[data-id="${bookmarkId}"]`);
+        bookmarkDiv.remove();
+
+        editModal.style.display = "none";
+    });
 });
 
-// Add a bookmark to the DOM
+// Open the edit modal with pre-filled bookmark data
+function openEditModal(bookmark) {
+    const editModal = document.getElementById('edit-bookmark-modal');
+    document.getElementById('edit-title').value = bookmark.title;
+    document.getElementById('edit-cover').value = bookmark.cover;
+    document.getElementById('edit-link').value = bookmark.link;
+    document.getElementById('edit-status').value = bookmark.status;
+    document.getElementById('edit-id').value = bookmark.id;
+
+    editModal.style.display = 'block';
+}
+
+
+// Add bookmark to the DOM
 function addBookmarkToDOM(bookmark) {
     const bookmarkDiv = document.createElement('div');
     bookmarkDiv.classList.add('bookmark');
+    bookmarkDiv.setAttribute('data-id', bookmark.id);
+
     bookmarkDiv.innerHTML = `
         <a href="${bookmark.link}" target="_blank">
             <img src="${bookmark.cover}" alt="${bookmark.title} Cover" />
             <p>${bookmark.title}</p>
         </a>
-        <button class="edit-btn" data-id="${bookmark.id}">Edit</button>
+        <button class="edit-btn">Edit</button>
     `;
-    booksContainer.appendChild(bookmarkDiv);
 
-    // Attach event listener for the "Edit" button
-    bookmarkDiv.querySelector('.edit-btn').addEventListener('click', () => {
-        openEditModal(bookmark);
-    });
+    booksContainer.appendChild(bookmarkDiv);
 }
 
-// Update a bookmark in the DOM
+// Update bookmark in the DOM after editing
 function updateBookmarkInDOM(bookmark) {
     const bookmarkDiv = document.querySelector(`.bookmark[data-id="${bookmark.id}"]`);
     bookmarkDiv.innerHTML = `
@@ -146,14 +170,16 @@ function updateBookmarkInDOM(bookmark) {
             <img src="${bookmark.cover}" alt="${bookmark.title} Cover" />
             <p>${bookmark.title}</p>
         </a>
-        <button class="edit-btn" data-id="${bookmark.id}">Edit</button>
+        <button class="edit-btn">Edit</button>
     `;
+
+    // Re-attach the event listener for "Edit"
     bookmarkDiv.querySelector('.edit-btn').addEventListener('click', () => {
         openEditModal(bookmark);
     });
 }
 
-// Load bookmarks from localStorage and display them
+// Load bookmarks from localStorage
 function loadBookmarksFromLocalStorage() {
     const savedBookmarks = JSON.parse(localStorage.getItem('bookmarks')) || [];
     savedBookmarks.forEach((bookmark) => {
@@ -161,20 +187,10 @@ function loadBookmarksFromLocalStorage() {
     });
 }
 
-// Save a new bookmark to localStorage
+// Save new bookmark to localStorage
 function saveBookmarkToLocalStorage(bookmark) {
     const savedBookmarks = JSON.parse(localStorage.getItem('bookmarks')) || [];
-    const newBookmark = { ...bookmark, id: Date.now().toString() }; // Add unique ID for editing
+    const newBookmark = { ...bookmark, id: Date.now().toString() };
     savedBookmarks.push(newBookmark);
     localStorage.setItem('bookmarks', JSON.stringify(savedBookmarks));
-}
-
-// Open the edit modal with pre-filled data
-function openEditModal(bookmark) {
-    const editModal = document.getElementById('edit-bookmark-modal');
-    document.getElementById('edit-title').value = bookmark.title;
-    document.getElementById('edit-cover').value = bookmark.cover;
-    document.getElementById('edit-link').value = bookmark.link;
-    document.getElementById('edit-id').value = bookmark.id;
-    editModal.style.display = 'block';
 }
