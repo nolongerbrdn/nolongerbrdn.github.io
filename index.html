@@ -3,11 +3,11 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Bookmarks</title>
     <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <script src="index.js" defer></script>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Bookmarks</title>
 </head>
 
 <body>
@@ -15,6 +15,43 @@
         <div id="header">
             <h1>My Bookmarks</h1>
         </div>
+
+        <!-- Button to Add Bookmark -->
+        <div id="add-bookmark">
+            <button id="add-btn">Add Bookmark</button>
+        </div>
+
+        <!-- Modal for Custom Prompt -->
+        <div id="bookmark-modal" class="modal">
+            <div class="modal-content">
+                <h2>Add Bookmark</h2>
+                <label for="title">Title:</label>
+                <input type="text" id="title" placeholder="Enter book title">
+                <label for="cover">Cover URL:</label>
+                <input type="text" id="cover" placeholder="Enter cover image URL">
+                <label for="link">Bookmark Link:</label>
+                <input type="text" id="link" placeholder="Enter bookmark link (URL)">
+                <label for="password">Password (Optional):</label>
+                <input type="password" id="password" placeholder="Enter password">
+                <div class="modal-actions">
+                    <button id="save-bookmark">Save</button>
+                    <button id="cancel-bookmark">Cancel</button>
+                </div>
+            </div>
+        </div>
+        <div id="edit-bookmark-modal" style="display: none;">
+            <label for="edit-title">Title:</label>
+            <input type="text" id="edit-title" placeholder="Enter the title" required>
+            <label for="edit-cover">Cover URL:</label>
+            <input type="text" id="edit-cover" placeholder="Enter cover image URL" required>
+            <label for="edit-link">Bookmark Link:</label>
+            <input type="text" id="edit-link" placeholder="Enter bookmark link" required>
+            <input type="hidden" id="edit-id">
+            <button id="save-edit-bookmark">Save Edit</button>
+            <button id="cancel-edit-bookmark">Cancel</button>
+        </div>
+
+
         <div id="content">
             <div class="bookmarks"></div>
         </div>
